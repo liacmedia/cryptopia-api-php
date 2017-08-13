@@ -279,19 +279,12 @@ class Api
         return $this->placeOrder($symbol, $amount, $price, 'Sell');
     }
 
-    public function marketOrderbook($symbol)
+    public function marketOrderbook($tradePairId)
     {
-        $mktOrders = json_decode($this->apiCall("GetMarketOrders", ['TradePairId' => $this->getExchangeSymbol($symbol)]), true);
-        unset($orders);
+        $mktOrders = json_decode($this->apiCall("GetMarketOrders", ['TradePairId' => $tradePairId]), true);
+        $orders = [];
         if ($mktOrders['Success'] == "true" && $mktOrders['Error'] == "") {
-            //print_r($mktOrders);
-            foreach ($mktOrders['Data'] as $orderType => $order) {
-                foreach ($order as $ordersByType) {
-                    // $standardSymbol = $this->getStandardSymbol($symbol);  // @todo not yet implemented
-                    $orders[] = ["symbol" => $symbol, "type" => $orderType, "price" => $ordersByType["Price"],
-                        "amount" => $ordersByType["Volume"]];
-                }
-            }
+            return $mktOrders['Data'];
         } else {
             throw new \Exception("Can't get orderbook, Error: " . $mktOrders['Error']);
         }
@@ -300,5 +293,3 @@ class Api
     }
 
 }
-
-?>
